@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",                /* Modern JS features */
+    "module": "commonjs",              /* Node uses CommonJS by default */
+    "rootDir": "./src",                /* Where your code lives */
+    "outDir": "./dist",                /* Where the build goes */
+    "strict": true,                    /* THE MOST IMPORTANT SETTING */
+    "esModuleInterop": true,           /* Allow default imports */
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,              /* Speed up compilation */
+    "resolveJsonModule": true,         /* Allow importing .json files */
+    "removeComments": true,            /* clean up build artifact */
+    
+    /* Path Aliases (Optional but clean) */
+    /* This lets you do import x from '@/models' instead of '../../models' */
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.test.ts"]
+}
