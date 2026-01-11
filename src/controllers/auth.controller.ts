@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import * as authService from '../services/auth.service';
-
+import { AppError } from '../utils/AppError';
+import { Worker } from 'worker_threads';
 // Zod Schema for Validation
 const registerSchema = z.object({
   email: z.email(),
@@ -48,9 +49,25 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
-export const getMe = (req: Request, res: Response) => {
-  res.status(200).json({
-    status: 'success',
-    data: { user: req.user },
-  });
+export const getMe = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return next(new AppError('Unauthorized', 401));
+    }
+
+    const user = await authService.getUserById(userId);
+
+    if (!user) {
+      return next(new AppError('User not found', 404));
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: { user },
+    });
+  } catch (error) {
+    next(error);
+  }
 };

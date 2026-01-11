@@ -41,9 +41,11 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Start Server
-app.listen(env.PORT, () => {
-  console.log(`🚀 Auth Service running on port ${env.PORT}`);
+if (require.main === module) {
+  app.listen(env.PORT, () => {
+    console.log(`🚀 REST API running on port ${env.PORT}`);
+    startGrpcServer();
+  });
+}
 
-  // Start gRPC in parallel
-  startGrpcServer();
-});
+export { app };

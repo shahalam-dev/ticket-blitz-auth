@@ -1,9 +1,10 @@
-import bcrypt from 'bcryptjs';
+// import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
 import { db } from '../database';
 import { users, refreshTokens } from '../database/schema';
 import { AppError } from '../utils/AppError';
 import { signAccessToken, signRefreshToken } from '../utils/jwt';
+import { hashPassword, verifyPassword } from '../utils/password';
 
 // Define the input type
 interface RegisterInput {
@@ -31,8 +32,8 @@ export const registerUser = async ({ email, password, name }: RegisterInput) => 
 
   // 2. Hash the password
   // Salt rounds = 12 is a good balance between security and speed
-  const salt = await bcrypt.genSalt(12);
-  const passwordHash = await bcrypt.hash(password, salt);
+  // const passwordHash = await bcrypt.hash(password, 12);
+  const passwordHash = await hashPassword(password);
 
   // 3. Create User in DB
   // returning() gives us back the created user object (excluding the hash if we select specific fields)
@@ -69,7 +70,8 @@ export const loginUser = async ({ email, password }: LoginInput) => {
   }
 
   // 2. Verify Password
-  const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+  // const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+  const isValidPassword = await verifyPassword(password, user.passwordHash);
   if (!isValidPassword) {
     throw new AppError('Invalid email or password', 401);
   }
@@ -100,4 +102,20 @@ export const loginUser = async ({ email, password }: LoginInput) => {
     accessToken,
     refreshToken,
   };
+};
+
+export const getUserById = async (userId: string) => {
+  const [user] = await db
+    .select({
+      id: users.id,
+      email: users.email,
+      name: users.name,
+      role: users.role,
+      createdAt: users.createdAt,
+    })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  return user;
 };
