@@ -1,4 +1,3 @@
-import './instrumentation';
 import express, { Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
